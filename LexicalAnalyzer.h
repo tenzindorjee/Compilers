@@ -1,4 +1,3 @@
-/* test */
 #pragma once
 #include <iostream>
 #include <string>
@@ -7,6 +6,7 @@
 #include <cstdlib>
 #include <vector>
 #include <cctype>
+#include <iomanip>
 using namespace std;
 
 class LexicalAnalyzer
@@ -42,20 +42,27 @@ class LexicalAnalyzer
         holder >> textFileHolder;
     }
     void LexicalAnalyzer::printTokenAndLexemes(vectorToken[])
-    { //iterates through the token vector until it reaches max size might need to fix up
-        cout << "TOKENS" << setw(15) << "LEXEMES" << endl;
+    {
+        //iterates through the token vector until it reaches max size might need to fix up
+        //Will output into a text file
+        fstream outfile;
+        outfile.open("output.txt");
+        outfile << "TOKENS" << setw(15) << "LEXEMES" << endl;
 
         for (int i = 0; i < vectorToken.size(); i++)
         {
             int tempToken = vectorToken[i].identifierState;
             int tempLexemes = vectorToken[i].lexemes;
 
-            cout << tempToken << setw(13) << "=" << tempLexemes << endl;
+            outfile << tempToken << setw(13) << "=" << tempLexemes << endl;
         }
+        outfile.close();
     }
-
-    //token LexicalAnalyzer::Lexer()
     // NEED TO WORK ON THIS AND THE TABLE
+    token LexicalAnalyzer::Lexer()
+    {
+        
+    }
 
 
     int LexicalAnalyzer::char_to_column(char c)
