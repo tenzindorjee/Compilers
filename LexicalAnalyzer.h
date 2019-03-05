@@ -19,6 +19,20 @@ class LexicalAnalyzer
 
     // list tokenList; // idk yet
     // list lexemeList;
+    
+    //FSM table for identifiers
+    const int ID_FSM_States[5][3] = {
+        {2, 5, 5},
+        {2, 3, 4},
+        {5, 5, 4},
+        {5, 4, 5},
+        {1, 1, 1}
+    };
+    
+    //FSM table for real and floating point numbers
+    const int RF_FSM_States[][] = {};
+        
+    }
     int currentState = 1;       // default state
     bool acceptedOrNot = false; //whether the state is accepted or not
     string textFileHolder;      //holds the text file into a string to iterate later on
@@ -63,7 +77,6 @@ class LexicalAnalyzer
     {
         
     }
-
 
     int LexicalAnalyzer::char_to_column(char c)
     { //functions to find the column the char belongs to so it can go through the table to find if accepted or not
