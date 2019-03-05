@@ -21,16 +21,23 @@ class LexicalAnalyzer
     // list lexemeList;
     
     //FSM table for identifiers
+    //inputs: letter, digit, or $
     const int ID_FSM_States[5][3] = {
-        {2, 5, 5},
-        {2, 3, 4},
-        {5, 5, 4},
-        {5, 4, 5},
-        {1, 1, 1}
+        {2, 5, 5},      //state 1(starting state); only accepts a letter initially, goes to dead state otherwise
+        {2, 3, 4},      //state 2(final state)
+        {5, 5, 4},      //state 3(final state); goes to dead state if input is a letter or digit
+        {5, 4, 5},      //state 4(final state); goes to dead state if input is a letter or $
+        {1, 1, 1}       //state 5(dead state); goes back to starting state
     };
     
     //FSM table for real and floating point numbers
-    const int RF_FSM_States[][] = {};
+    //inputs: digit or .
+    const int RF_FSM_States[4][2] = {
+        {2, 4},     //state 1(starting state)
+        {2, 3},     //state 2(final state)
+        {2, 4},     //state 3
+        {1, 1}      //state 4
+    };
         
     }
     int currentState = 1;       // default state
