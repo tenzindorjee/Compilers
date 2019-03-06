@@ -8,6 +8,7 @@
 #include <cctype>
 #include <iomanip>
 #include <string>
+#include <sstream>
 using namespace std;
 
 class LexicalAnalyzer
@@ -35,23 +36,14 @@ class LexicalAnalyzer
   public:
     void textToString(string textFile)
     { //opens textfile and then stores it into a string for further use
+        ifstream inFile;
+        inFile.open(textFile); //open the input file
 
-        ifstream file(textFile);
-        string tempString;
-        if (file.is_open())
-        {
-            cout << "hello" << endl;
-            while (getline(file, tempString))
-            {
-                tempString += tempString;
-                tempString += " ";
-            }
-            cout << tempString;
-            textFileHolder = tempString;
-            cout << textFileHolder << endl;
-            file.close();
-        }
+        stringstream strStream;
+        strStream << inFile.rdbuf();  //read the file
+        string str = strStream.str(); //str holds the content of the file
 
+        //cout << str << endl; //you can do anything with the string!!!
         //string_to_charVector(textFileHolder);
     }
     void printTokenAndLexemes(vector<token> vectorToken)
@@ -87,8 +79,11 @@ class LexicalAnalyzer
                 indexUpdate();
                 cout << vectorIndex << endl;
             }
+            indexUpdate();
             cout << vectorIndex << endl;
         }
+
+        // else if (charVector[vectorIndex])
     }
     void indexUpdate()
     {
