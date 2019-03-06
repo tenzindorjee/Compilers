@@ -43,14 +43,16 @@ class LexicalAnalyzer
             cerr << "Error Opening TextFile" << endl;
             exit(1);
         }
+
         holder >> textFileHolder;
+        holder.close();
         string_to_charVector(textFileHolder);
     }
     void printTokenAndLexemes(vector<token> vectorToken)
     { //iterates through the token vector until it reaches max size might need to fix up
         cout << "TOKENS" << setw(15) << "LEXEMES" << endl;
 
-        for (unsigned int i = 0; i < vectorToken.size(); i++)
+        for (int i = 0; i < vectorToken.size(); i++)
         {
             string tempToken = vectorToken[i].identifierState;
             string tempLexemes = vectorToken[i].lexemes;
@@ -61,14 +63,14 @@ class LexicalAnalyzer
 
     void string_to_charVector(string textFileHolder)
     { //converts the string that holds all the text file to a char vector for further manipulation
-        for (unsigned int i = 0; i < textFileHolder.length(); i++)
+        for (int i = 0; i < textFileHolder.length(); i++)
         {
             charVector[i] = textFileHolder[i];
         }
         Lexer(charVector);
     }
 
-    token Lexer(vector<char> charVector)
+    void Lexer(vector<char> charVector)
     { //NEED TO NO LIFE THE FUCK OUT OF THIS PART BRUH
         if (charVector[vectorIndex] == '!')
         {
@@ -93,8 +95,10 @@ class LexicalAnalyzer
 
         for (unsigned int i = 0; i < 13; i++)
         {
-            tempString == SEPERATORS[i];
-            return 1; // returns true if the char/string is equivalent to a valid seperator
+            if (tempString == SEPERATORS[i])
+            {
+                return 1; // returns true if the char/string is equivalent to a valid seperator
+            }
         }
         return 0;
     }
@@ -106,33 +110,34 @@ class LexicalAnalyzer
 
         for (unsigned int i = 0; i < 8; i++)
         {
-            tempString == OPERATORS[i];
-            return 1;
+            if (tempString == OPERATORS[i])
+            {
+                return 1;
+            }
         }
         return 0;
     }
 
     int char_to_column(char c)
     { //functions to find the column the char belongs to so it can go through the table to find if accepted or not
-
-        if (isalpha(c))
+        int tempInt;
+        if (isalpha(c) || c == '.')
         {
-            return 1;
+            tempInt = 1;
         }
 
         else if (isdigit(c))
         {
-            return 2;
+            tempInt = 2;
         }
 
         else if (c == '$')
         {
-            return 3;
+            tempInt = 3;
         }
+        else
+            cerr << "Error Column doesnt exist" << endl;
 
-        else if (c == '.')
-        {
-            return 1;
-        }
+        return tempInt;
     }
 };
