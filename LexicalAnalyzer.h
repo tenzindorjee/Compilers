@@ -28,25 +28,31 @@ class LexicalAnalyzer
     typedef struct tokens
     {
         string identifierState; // token identifier
-        string lexemes;
-        string state; //lexemes
+        string lexemes;         //lexemes
     } token;
 
     vector<token> tokenVector; //holds the token
   public:
     void textToString(string textFile)
     { //opens textfile and then stores it into a string for further use
-        fstream holder;
-        holder.open(textFile);
-        if (holder.fail())
+
+        ifstream file(textFile);
+        string tempString;
+        if (file.is_open())
         {
-            cerr << "Error Opening TextFile" << endl;
-            exit(1);
+            cout << "hello" << endl;
+            while (getline(file, tempString))
+            {
+                tempString += tempString;
+                tempString += " ";
+            }
+            cout << tempString;
+            textFileHolder = tempString;
+            cout << textFileHolder << endl;
+            file.close();
         }
 
-        holder >> textFileHolder;
-        holder.close();
-        string_to_charVector(textFileHolder);
+        //string_to_charVector(textFileHolder);
     }
     void printTokenAndLexemes(vector<token> vectorToken)
     { //iterates through the token vector until it reaches max size might need to fix up

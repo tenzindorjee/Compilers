@@ -1,6 +1,14 @@
 #include <iostream>
 #include "LexicalAnalyzer.h"
-
+#include <iostream>
+#include <string>
+#include <list>
+#include <fstream>
+#include <cstdlib>
+#include <vector>
+#include <cctype>
+#include <iomanip>
+#include <string>
 using namespace std;
 
 int main()
