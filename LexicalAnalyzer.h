@@ -28,12 +28,13 @@ class LexicalAnalyzer
     typedef struct tokens
     {
         string identifierState; // token identifier
-        string lexemes;         //lexemes
+        string lexemes;
+        string state; //lexemes
     } token;
 
     vector<token> tokenVector; //holds the token
   public:
-    void LexicalAnalyzer::textToString(string textFile)
+    void textToString(string textFile)
     { //opens textfile and then stores it into a string for further use
         fstream holder;
         holder.open(textFile);
@@ -45,7 +46,7 @@ class LexicalAnalyzer
         holder >> textFileHolder;
         string_to_charVector(textFileHolder);
     }
-    void LexicalAnalyzer::printTokenAndLexemes(vector<token> vectorToken)
+    void printTokenAndLexemes(vector<token> vectorToken)
     { //iterates through the token vector until it reaches max size might need to fix up
         cout << "TOKENS" << setw(15) << "LEXEMES" << endl;
 
@@ -58,22 +59,34 @@ class LexicalAnalyzer
         }
     }
 
-    void LexicalAnalyzer::string_to_charVector(string textFileHolder)
+    void string_to_charVector(string textFileHolder)
     { //converts the string that holds all the text file to a char vector for further manipulation
         for (unsigned int i = 0; i < textFileHolder.length(); i++)
         {
             charVector[i] = textFileHolder[i];
         }
+        Lexer(charVector);
     }
 
-    token LexicalAnalyzer::Lexer(vector<char> charVector)
+    token Lexer(vector<char> charVector)
     { //NEED TO NO LIFE THE FUCK OUT OF THIS PART BRUH
-        while (!charVector.empty())
+        if (charVector[vectorIndex] == '!')
         {
+            indexUpdate();
+
+            while (charVector[vectorIndex] != '!')
+            {
+                indexUpdate();
+                cout << vectorIndex << endl;
+            }
+            cout << vectorIndex << endl;
         }
     }
-
-    bool LexicalAnalyzer::isSeperator(char c)
+    void indexUpdate()
+    {
+        vectorIndex++;
+    }
+    bool isSeperator(char c)
     {
         string tempString; // a temporary string so that we can convert the char to string for comparison to the seperator array
         tempString += c;   // tempString = tempString + char
@@ -86,7 +99,7 @@ class LexicalAnalyzer
         return 0;
     }
 
-    bool LexicalAnalyzer::isOperator(char c)
+    bool isOperator(char c)
     {
         string tempString;
         tempString += c;
@@ -99,7 +112,7 @@ class LexicalAnalyzer
         return 0;
     }
 
-    int LexicalAnalyzer::char_to_column(char c)
+    int char_to_column(char c)
     { //functions to find the column the char belongs to so it can go through the table to find if accepted or not
 
         if (isalpha(c))
@@ -122,4 +135,4 @@ class LexicalAnalyzer
             return 1;
         }
     }
-}
+};
