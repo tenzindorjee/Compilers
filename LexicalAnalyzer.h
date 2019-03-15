@@ -81,7 +81,7 @@ class LexicalAnalyzer
             if (commentCheck == false)
             {
                 if (*it == "!")
-                {
+                { //change the iterator name from fuckIt to something normal DARK TIMES BROOOOOOO
                     vector<string>::iterator fuckIt = it++;
                     while (*fuckIt != "!")
                     {
