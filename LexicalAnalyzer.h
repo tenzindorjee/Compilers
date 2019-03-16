@@ -26,7 +26,6 @@ class LexicalAnalyzer
     vector<string> charList;
     typedef struct tokens
     {
-        char tempState;
         string identifierState; // token identifier
         string lexemes;         //lexemes
     } token;
@@ -81,15 +80,15 @@ class LexicalAnalyzer
             if (commentCheck == false)
             {
                 if (*it == "!")
-                { //change the iterator name from fuckIt to something normal DARK TIMES BROOOOOOO
-                    vector<string>::iterator fuckIt = it++;
-                    while (*fuckIt != "!")
+                { //change the iterator name from peekIt to something normal DARK TIMES BROOOOOOO
+                    vector<string>::iterator peekIt = it++;
+                    while (*peekIt != "!")
                     {
                         cout << "not done retard" << endl;
-                        fuckIt++;
+                        peekIt++;
                     }
 
-                    while (*it != *fuckIt)
+                    while (*it != *peekIt)
                     {
                         it++;
                     }
@@ -98,23 +97,35 @@ class LexicalAnalyzer
                     commentClose = true;
 
                     // cout << *it << endl;
-                    // cout << *fuckIt << endl;
+                    // cout << *peekIt << endl;
                     it++;
                 }
             }
 
             if (commentCheck == true)
             {
-                tokenVector[index].identifierState = *it;
-                //need to fix segmentation fault due to not being able to access the tokenvector
-                //need to fix
-            }
+                if (*it == " " || *it == "/r" || *it == "/n")
+                {
+                    it++;
+                }
+                else
+                {
+                    tokenVector.insert = *it;
+                }
+                /* NEED TO FIND WAY TO INSERT INTO THE STRUCT VECTOR */
+                tokenVector.insert = *it;
+                        }
         }
     }
 
-    // void lexer2(char c){
+    void tokenCheck(vector<token> tokenVector)
+    {
+        for (int i = 0; i < tokenVector.size(); i++)
+        {
+            cout << tokenVector[i].identifierState << " ";
+        }
+    }
 
-    // }
     bool isSeperator(string s)
     {
 
