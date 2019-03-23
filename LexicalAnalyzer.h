@@ -17,7 +17,6 @@ class LexicalAnalyzer
     string KEYWORDS[15] = {"int", "float", "bool", "if", "else", "then", "do", "while", "whileend", "do", "doend", "for", "and", "or", "function"};
     string OPERATORS[8] = {"*", "+", "-", "=", "/", ">", "<", "%"};
     string SEPERATORS[13] = {"'", "(", ")", "{", "}", "[", "]", ",", ".", ":", ";", "!", " "};
-    string STATE[8] = {"UNKNOWN", "IDENTIFIER", "INTEGER", "KEYWORD", "SEPERATOR", "OPERATOR", "REAL", "DECIMAL"};
     const int legal_identifier[5][3] = {{2, 5, 5}, {2, 3, 4}, {5, 5, 4}, {5, 4, 5}, {1, 1, 1}}; // legal identifier fsm
     const int digit_or_float_fsm[4][2] = {{4, 2}, {3, 2}, {4, 2}, {1, 1}};                      // real or float fsm                                                                      //contains current index of the vector of chars so we can test which index we are at
     int currentState = 1;                                                                       // default state
@@ -26,10 +25,9 @@ class LexicalAnalyzer
     vector<string> charList;
     typedef struct tokens
     {
-        string identifierState; // token identifier
-        string lexemes;         //lexemes
+        string lexemes;
+        string tokens;
     } token;
-
     vector<token> tokenVector; //holds the token
     int tempIndex = 0;
 
@@ -42,20 +40,15 @@ class LexicalAnalyzer
         strStream << inFile.rdbuf();  //read the file
         string str = strStream.str(); //str holds the content of the file
         textFileHolder = str;
-        // cout << str << endl; //you can do anything with the string!!!
-        //string_to_charVector(textFileHolder);
-        // cout << str.size() << endl;
         string_to_charList(textFileHolder);
-        // cout << charVector[vectorIndex] << endl;
     }
     void printTokenAndLexemes(vector<token> tokenVector)
     { //iterates through the token vector until it reaches max size might need to fix up
-        cout << "TOKENS" << setw(15) << "LEXEMES" << endl;
         for (int i = 0; i < tokenVector.size(); i++)
         {
-            string tempToken = tokenVector[i].identifierState;
-            string tempLexemes = tokenVector[i].lexemes;
-            cout << tempToken << setw(13) << "=" << tempLexemes << endl;
+            string tempToken = tokenVector[i].lexemes;
+            string tempLexemes = tokenVector[i].tokens;
+            cout << tempToken << "=" << tempLexemes << endl;
         }
     }
 
@@ -108,28 +101,43 @@ class LexicalAnalyzer
                 {
                     it++;
                 }
-                else
+                else if (isSeperator(*it) == 1)
                 {
-                    tokenVector.insert = *it;
-                }
-                /* NEED TO FIND WAY TO INSERT INTO THE STRUCT VECTOR */
-                tokenVector.insert = *it;
+                    for (int i = 0; i < 13; i++)
+                    {
+                        if (SEPERATORS[i] == *it)
+                        {
+                            token TempToken;
+                            TempToken.lexemes = *it;
+                            TempToken.tokens = "SEPERATOR";
+                            tokenVector.push_back(TempToken);
+                            it++;
                         }
-        }
-    }
-
-    void tokenCheck(vector<token> tokenVector)
-    {
-        for (int i = 0; i < tokenVector.size(); i++)
-        {
-            cout << tokenVector[i].identifierState << " ";
+                    }
+                }
+                else if (isOperator(*it) == 1)
+                {
+                    for (int i = 0; i < 8; i++)
+                    {
+                        if (OPERATORS[i] == *it)
+                        {
+                            token TempToken1;
+                            TempToken1.lexemes = *it;
+                            TempToken1.tokens = "OPERATOR";
+                            tokenVector.push_back(TempToken1);
+                            it++;
+                        }
+                    }
+                }
+            }
+            printTokenAndLexemes(tokenVector);
         }
     }
 
     bool isSeperator(string s)
     {
 
-        for (unsigned int i = 0; i < 13; i++)
+        for (int i = 0; i < 13; i++)
         {
             if (s == SEPERATORS[i])
             {
@@ -142,7 +150,7 @@ class LexicalAnalyzer
     bool isOperator(string s)
     {
 
-        for (unsigned int i = 0; i < 8; i++)
+        for (int i = 0; i < 8; i++)
         {
             if (s == OPERATORS[i])
             {
