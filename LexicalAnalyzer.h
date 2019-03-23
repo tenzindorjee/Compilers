@@ -48,7 +48,7 @@ class LexicalAnalyzer
         {
             string tempToken = tokenVector[i].lexemes;
             string tempLexemes = tokenVector[i].tokens;
-            cout << tempToken << "=" << tempLexemes << endl;
+            cout << tempToken << " = " << tempLexemes << endl;
         }
     }
 
@@ -68,75 +68,55 @@ class LexicalAnalyzer
     {
         for (vector<string>::iterator it = charList.begin(); it < charList.end(); it++)
         {
-            bool commentCheck = false;
-            bool commentClose = false;
-            if (commentCheck == false)
-            {
-                if (*it == "!")
-                { //change the iterator name from peekIt to something normal DARK TIMES BROOOOOOO
-                    vector<string>::iterator peekIt = it++;
-                    while (*peekIt != "!")
-                    {
-                        cout << "not done retard" << endl;
-                        peekIt++;
-                    }
-
-                    while (*it != *peekIt)
-                    {
-                        it++;
-                    }
-
-                    commentCheck = true;
-                    commentClose = true;
-
-                    // cout << *it << endl;
-                    // cout << *peekIt << endl;
-                    it++;
+            if (*it == "!")
+            { //change the iterator name from peekIt to something normal DARK TIMES BROOOOOOO
+                vector<string>::iterator peekIt = it++;
+                while (*peekIt != "!")
+                {
+                    cout << "not done" << endl;
+                    peekIt++;
                 }
-            }
 
-            if (commentCheck == true)
-            {
-                if (*it == " " || *it == "/r" || *it == "/n")
+                while (*it != *peekIt)
                 {
                     it++;
                 }
-                else if (isSeperator(*it) == 1)
+
+                it++;
+            }
+
+            else if (isSeperator(*it) == 1)
+            {
+                for (int i = 0; i < 13; i++)
                 {
-                    for (int i = 0; i < 13; i++)
+                    if (SEPERATORS[i] == *it)
                     {
-                        if (SEPERATORS[i] == *it)
-                        {
-                            token TempToken;
-                            TempToken.lexemes = *it;
-                            TempToken.tokens = "SEPERATOR";
-                            tokenVector.push_back(TempToken);
-                            it++;
-                        }
-                    }
-                }
-                else if (isOperator(*it) == 1)
-                {
-                    for (int i = 0; i < 8; i++)
-                    {
-                        if (OPERATORS[i] == *it)
-                        {
-                            token TempToken1;
-                            TempToken1.lexemes = *it;
-                            TempToken1.tokens = "OPERATOR";
-                            tokenVector.push_back(TempToken1);
-                            it++;
-                        }
+                        token TempToken;
+                        TempToken.lexemes = *it;
+                        TempToken.tokens = "SEPERATOR";
+                        tokenVector.push_back(TempToken);
                     }
                 }
             }
-            printTokenAndLexemes(tokenVector);
+            else if (isOperator(*it) == 1)
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    if (OPERATORS[i] == *it)
+                    {
+                        token TempToken;
+                        TempToken.lexemes = *it;
+                        TempToken.tokens = "OPERATOR";
+                        tokenVector.push_back(TempToken);
+                    }
+                }
+            }
         }
+        printTokenAndLexemes(tokenVector);
     }
 
     bool isSeperator(string s)
     {
-
         for (int i = 0; i < 13; i++)
         {
             if (s == SEPERATORS[i])
