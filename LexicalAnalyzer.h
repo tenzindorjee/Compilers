@@ -15,14 +15,12 @@ class LexicalAnalyzer
 {
   private:
     string KEYWORDS[15] = {"int", "float", "bool", "if", "else", "then", "do", "while", "whileend", "do", "doend", "for", "and", "or", "function"};
-    string OPERATORS[8] = {"*", "+", "-", "=", "/", ">", "<", "%"};
-    string SEPERATORS[13] = {"'", "(", ")", "{", "}", "[", "]", ",", ".", ":", ";", "!", " "};
+    char OPERATORS[8] = {'*', '+', '-', '=', '/', '>', '<', '%'};
+    char SEPERATORS[13] = {'\'', '(', ')', '{', '}', '[', ']', ',', '.', ':', ';', '!'};
     const int legal_identifier[5][3] = {{2, 5, 5}, {2, 3, 4}, {5, 5, 4}, {5, 4, 5}, {1, 1, 1}}; // legal identifier fsm
-    const int digit_or_float_fsm[4][2] = {{4, 2}, {3, 2}, {4, 2}, {1, 1}};                      // real or float fsm                                                                      //contains current index of the vector of chars so we can test which index we are at
-    int currentState = 1;                                                                       // default state
-    bool acceptedOrNot = false;                                                                 //whether the state is accepted or not
+    const int digit_or_float_fsm[4][2] = {{4, 2}, {3, 2}, {4, 2}, {1, 1}};                      // real or float fsm                                                                      //contains current index of the vector of chars so we can test which index we are at                                                   // default state                                                                //whether the state is accepted or not
     string textFileHolder;                                                                      //holds the text file into a string to iterate later on
-    vector<string> charList;
+    vector<char> charList;
     typedef struct tokens
     {
         string lexemes;
@@ -56,36 +54,32 @@ class LexicalAnalyzer
     { //converts the string that holds all the text file to a char vector for further manipulation
         for (int i = 0; i < textFileHolder.length(); i++)
         {
-            string tempString;
-            tempString += textFileHolder[i];
-            charList.push_back(tempString);
+            charList.push_back(textFileHolder[i]);
             // cout << tempString << endl;
         }
         Lexer(charList, tokenVector);
     }
 
-    void Lexer(vector<string> charList, vector<token> tokenVector)
+    void Lexer(vector<char> charList, vector<token> tokenVector)
     {
-        for (vector<string>::iterator it = charList.begin(); it < charList.end(); it++)
+        for (vector<char>::iterator it = charList.begin(); it < charList.end(); it++)
         {
-            if (*it == "!")
+            if (*it == '!')
             { //change the iterator name from peekIt to something normal DARK TIMES BROOOOOOO
-                vector<string>::iterator peekIt = it++;
-                while (*peekIt != "!")
+                vector<char>::iterator peekIt = it++;
+                while (*peekIt != '!')
                 {
                     cout << "not done" << endl;
                     peekIt++;
                 }
-
                 while (*it != *peekIt)
                 {
                     it++;
                 }
-
                 it++;
             }
 
-            else if (isSeperator(*it) == 1)
+            else if (isSeperator(*it) == true)
             {
                 for (int i = 0; i < 13; i++)
                 {
@@ -98,7 +92,7 @@ class LexicalAnalyzer
                     }
                 }
             }
-            else if (isOperator(*it) == 1)
+            else if (isOperator(*it) == true)
             {
                 for (int i = 0; i < 8; i++)
                 {
@@ -111,15 +105,37 @@ class LexicalAnalyzer
                     }
                 }
             }
+
+            // else if (isIdentifier(*it) == true)
+            // {
+            //     int initialState = 1;     // initial state of the fsm
+            //     token tempToken;          //temp token
+            //     string comboString = *it; //identifier holder
+
+            //     while (legal_identifier[initialState][findColumn(*it) != 5])
+            //     {
+            //         if (legal_identifier[initialState][findColumn(*it)] == 2)
+            //         {
+
+            //             initialState = 2;
+            //             it++;
+            //         }
+            //         else if (legal_identifier[initialState][findColumn(*it) == 3])
+            //         {
+            //             initialState = 3;
+            //             it++;
+            //         }
+            //     }
+            // }
         }
         printTokenAndLexemes(tokenVector);
     }
 
-    bool isSeperator(string s)
+    bool isSeperator(char c)
     {
-        for (int i = 0; i < 13; i++)
+        for (int i = 0; i < 12; i++)
         {
-            if (s == SEPERATORS[i])
+            if (c == SEPERATORS[i])
             {
                 return 1; // returns true if the char/string is equivalent to a valid seperator
             }
@@ -127,12 +143,12 @@ class LexicalAnalyzer
         return 0;
     }
 
-    bool isOperator(string s)
+    bool isOperator(char c)
     {
 
         for (int i = 0; i < 8; i++)
         {
-            if (s == OPERATORS[i])
+            if (c == OPERATORS[i])
             {
                 return 1;
             }
@@ -140,28 +156,26 @@ class LexicalAnalyzer
         return 0;
     }
     // NEED TO FIX
-    // int char_to_column(char c)
-    // { //functions to find the column the char belongs to so it can go through the table to find if accepted or not
-    //     int tempInt;
-    //     if (is(c) || c == '.')
-    //     {
-    //         tempInt = 1;
-    //     }
+    int findColumn(string s)
+    { //functions to find the column the char belongs to so it can go through the table to find if accepted or not
+        int tempInt;
+        if (isAplhanumeric(s) == true || s == ".")
+        {
+            tempInt = 1;
+        }
+        else if (isNumber(s) == true)
+        {
+            tempInt = 2;
+        }
+        else if (s == "$")
+        {
+            tempInt = 3;
+        }
+        else
+            cerr << "Error Column doesnt exist" << endl;
 
-    //     else if (isdigit(c))
-    //     {
-    //         tempInt = 2;
-    //     }
-
-    //     else if (c == '$')
-    //     {
-    //         tempInt = 3;
-    //     }
-    //     else
-    //         cerr << "Error Column doesnt exist" << endl;
-
-    //     return tempInt;
-    // }
+        return tempInt;
+    }
 
     bool isIdentifier(string s)
     {
@@ -172,10 +186,40 @@ class LexicalAnalyzer
         {
             if (s == alphaArray[i])
             {
-                return true;
+                return 1;
             }
         }
 
-        return true;
+        return 0;
+    }
+
+    bool isNumber(string s)
+    {
+        string numberArray[] = {"1", "2", "3", "4", "6", "7", "8", "9", "0"};
+
+        for (int i = 0; i < 9; i++)
+        {
+            if (s == numberArray[i])
+            {
+                return 1;
+            }
+        }
+        return 0;
+    }
+
+    bool isAplhanumeric(string s)
+    {
+        string alphArray[] = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O",
+                              "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+
+        for (int i = 0; i < 52; i++)
+        {
+            if (s == alphArray[i])
+            {
+                return 1;
+            }
+        }
+
+        return 0;
     }
 };
