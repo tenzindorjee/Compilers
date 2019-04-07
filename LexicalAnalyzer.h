@@ -10,7 +10,7 @@
 #include <string>
 #include <sstream>
 using namespace std;
-
+/* had problems with literals because of the apostrophe char turned everything to string but ended up turning everything to chars because thats how a compiler is supposed to work */
 class LexicalAnalyzer
 {
   private:
@@ -28,6 +28,7 @@ class LexicalAnalyzer
     } token;
     vector<token> tokenVector; //holds the token
     int tempIndex = 0;
+    bool commentCheck = false;
 
   public:
     void textToString(string textFile)
@@ -67,6 +68,7 @@ class LexicalAnalyzer
             if (*it == '!')
             { //change the iterator name from peekIt to something normal DARK TIMES BROOOOOOO
                 vector<char>::iterator peekIt = it++;
+                commentCheck = true;
                 while (*peekIt != '!')
                 {
                     cout << "not done" << endl;
@@ -77,6 +79,7 @@ class LexicalAnalyzer
                     it++;
                 }
                 it++;
+                commentCheck = false;
             }
 
             else if (isSeperator(*it) == true)
@@ -106,27 +109,47 @@ class LexicalAnalyzer
                 }
             }
 
-            // else if (isIdentifier(*it) == true)
-            // {
-            //     int initialState = 1;     // initial state of the fsm
-            //     token tempToken;          //temp token
-            //     string comboString = *it; //identifier holder
+            else if (isAlphanumeric(*it) == true && commentCheck == false && *it != ' ')
+            {
 
-            //     while (legal_identifier[initialState][findColumn(*it) != 5])
-            //     {
-            //         if (legal_identifier[initialState][findColumn(*it)] == 2)
-            //         {
+                string tempString;
+                int defaultS = 1;
+                vector<char>::iterator neext = it++;
+                it--;
+                while (isAlphanumeric(*neext) == true && *neext != ' ' && defaultS != 5 && commentCheck == false && isAlphanumeric(*it) == true)
+                {
 
-            //             initialState = 2;
-            //             it++;
-            //         }
-            //         else if (legal_identifier[initialState][findColumn(*it) == 3])
-            //         {
-            //             initialState = 3;
-            //             it++;
-            //         }
-            //     }
-            // }
+                    defaultS = legal_identifier[defaultS][findColumn(*it)];
+                    tempString += *it;
+                    it++;
+
+                    neext++;
+                }
+                it--;
+
+                if (keywordTrue(tempString) == true)
+                {
+                    for (int i = 0; i < 15; i++)
+                    {
+                        if (tempString == KEYWORDS[i])
+                        {
+                            token TempToken;
+                            TempToken.lexemes = tempString;
+                            TempToken.tokens = KEYWORDS[i];
+                            tokenVector.push_back(TempToken);
+                        }
+                    }
+                }
+                else
+                {
+                    token TempToken;
+                    TempToken.lexemes = tempString;
+                    TempToken.tokens = "IDENTIFIER";
+                    tokenVector.push_back(TempToken);
+                }
+
+                defaultS = 1;
+            }
         }
         printTokenAndLexemes(tokenVector);
     }
@@ -156,70 +179,50 @@ class LexicalAnalyzer
         return 0;
     }
     // NEED TO FIX
-    int findColumn(string s)
+    bool isAlphanumeric(char c)
+    {
+        if (isalpha(c) == true || c == '$' || isdigit(c) == true)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    bool keywordTrue(string s)
+    {
+        for (int i = 0; i < 15; i++)
+        {
+            if (s == KEYWORDS[i])
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    int findColumn(char c)
     { //functions to find the column the char belongs to so it can go through the table to find if accepted or not
         int tempInt;
-        if (isAplhanumeric(s) == true || s == ".")
+        if (isAlphanumeric(c) == true || c == '.')
         {
             tempInt = 1;
         }
-        else if (isNumber(s) == true)
+        else if (isdigit(c) == true)
         {
             tempInt = 2;
         }
-        else if (s == "$")
+        else if (c == '$')
         {
             tempInt = 3;
         }
         else
-            cerr << "Error Column doesnt exist" << endl;
-
+        {
+            cout << "char is " << c << endl;
+            // cerr << "Error Column doesnt exist" << endl;
+        }
         return tempInt;
-    }
-
-    bool isIdentifier(string s)
-    {
-        string alphaArray[] = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O",
-                               "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "$"};
-
-        for (int i = 0; i < 53; i++)
-        {
-            if (s == alphaArray[i])
-            {
-                return 1;
-            }
-        }
-
-        return 0;
-    }
-
-    bool isNumber(string s)
-    {
-        string numberArray[] = {"1", "2", "3", "4", "6", "7", "8", "9", "0"};
-
-        for (int i = 0; i < 9; i++)
-        {
-            if (s == numberArray[i])
-            {
-                return 1;
-            }
-        }
-        return 0;
-    }
-
-    bool isAplhanumeric(string s)
-    {
-        string alphArray[] = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O",
-                              "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
-
-        for (int i = 0; i < 52; i++)
-        {
-            if (s == alphArray[i])
-            {
-                return 1;
-            }
-        }
-
-        return 0;
     }
 };
