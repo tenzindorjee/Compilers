@@ -3,6 +3,7 @@
 int num1, num2, large$
 if(num1 > num2)
 {
+	float = 10.45;
 	large = num1$;
 }
 else

@@ -45,8 +45,8 @@ class LexicalAnalyzer
     { //iterates through the token vector until it reaches max size might need to fix up
         for (int i = 0; i < tokenVector.size(); i++)
         {
-            string tempToken = tokenVector[i].lexemes;
-            string tempLexemes = tokenVector[i].tokens;
+            string tempToken = tokenVector[i].tokens;
+            string tempLexemes = tokenVector[i].lexemes;
             cout << tempToken << " = " << tempLexemes << endl;
         }
     }
@@ -135,7 +135,7 @@ class LexicalAnalyzer
                         {
                             token TempToken;
                             TempToken.lexemes = tempString;
-                            TempToken.tokens = KEYWORDS[i];
+                            TempToken.tokens = "KEYWORD";
                             tokenVector.push_back(TempToken);
                         }
                     }
@@ -149,6 +149,47 @@ class LexicalAnalyzer
                 }
 
                 defaultS = 1;
+            }
+
+            else if (isnumber(*it) == true && commentCheck == false /*&& *it != ' '*/)
+            {
+                cout << *it << "before " << endl;
+                string tempString;
+                int defaultS = 1;
+                vector<char>::iterator floatPeek = it++;
+                // it--;
+                bool floatCheck = false;
+
+                while (isnumber(*floatPeek) == true && isNumber(*it) == true && *floatPeek != ' ' && defaultS != 4 && commentCheck == false)
+                {
+                    cout << *it << " in loop ";
+                    cout << *floatPeek << "in loop ";
+                    if (*it == '.')
+                    {
+                        floatCheck = true;
+                    }
+                    defaultS = digit_or_float_fsm[defaultS][findNumColumn(*it)];
+                    tempString += *it;
+                    floatPeek++;
+                    it++;
+                }
+
+                if (floatCheck == true)
+                {
+                    token TempToken;
+                    TempToken.lexemes = tempString;
+                    TempToken.tokens = "REAL";
+                    tokenVector.push_back(TempToken);
+                }
+                else if (floatCheck == false)
+                {
+                    token TempToken;
+                    TempToken.lexemes = tempString;
+                    TempToken.tokens = "INTEGER";
+                    tokenVector.push_back(TempToken);
+                }
+                defaultS = 1;
+                floatCheck = false;
             }
         }
         printTokenAndLexemes(tokenVector);
@@ -191,6 +232,17 @@ class LexicalAnalyzer
         }
     }
 
+    bool isNumber(char c)
+    {
+        if (isdigit(c) == true || c == '.')
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
     bool keywordTrue(string s)
     {
         for (int i = 0; i < 15; i++)
@@ -220,9 +272,26 @@ class LexicalAnalyzer
         }
         else
         {
-            cout << "char is " << c << endl;
-            // cerr << "Error Column doesnt exist" << endl;
+
+            cerr << "Error Column doesnt exist" << endl;
         }
         return tempInt;
+    }
+    int findNumColumn(char c)
+    {
+        int holderInt;
+        if (c == '.')
+        {
+            holderInt = 1;
+        }
+        else if (isdigit(c) == true)
+        {
+            holderInt = 2;
+        }
+        else
+        {
+            cerr << "Error Column doesnt exist" << endl;
+        }
+        return holderInt;
     }
 };
