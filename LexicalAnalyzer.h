@@ -1,7 +1,6 @@
 #pragma once
 #include <iostream>
 #include <string>
-#include <list>
 #include <fstream>
 #include <cstdlib>
 #include <vector>
@@ -9,28 +8,27 @@
 #include <iomanip>
 #include <string>
 #include <sstream>
+#include <stdexcept>
 using namespace std;
-/* had problems with literals because of the apostrophe char turned everything to string but ended up turning everything to chars because thats how a compiler is supposed to work */
 class LexicalAnalyzer
 {
   private:
     string KEYWORDS[15] = {"int", "float", "bool", "if", "else", "then", "do", "while", "whileend", "do", "doend", "for", "and", "or", "function"};
     char OPERATORS[8] = {'*', '+', '-', '=', '/', '>', '<', '%'};
     char SEPERATORS[13] = {'\'', '(', ')', '{', '}', '[', ']', ',', '.', ':', ';', '!'};
-    const int legal_identifier[5][3] = {{2, 5, 5}, {2, 3, 4}, {5, 5, 4}, {5, 4, 5}, {1, 1, 1}}; // legal identifier fsm
-    const int digit_or_float_fsm[4][2] = {{3, 1}, {2, 1}, {3, 1}, {3, 3}};
-    //const int digit_or_float_fsm[4][2] = {{4, 2}, {3, 2}, {4, 2}, {1, 1}};
-    // real or float fsm                                                                      //contains current index of the vector of chars so we can test which index we are at                                                   // default state                                                                //whether the state is accepted or not
-    string textFileHolder; //holds the text file into a string to iterate later on
-    vector<char> charList;
-    typedef struct tokens
+    const int legal_identifier[5][3] = {{1, 4, 4}, {1, 2, 3}, {1, 2, 3}, {1, 2, 3}, {4, 4, 4}}; // legal identifier fsm
+    const int digit_or_float_fsm[4][2] = {{3, 1}, {2, 1}, {3, 1}, {3, 3}};                      // real or float fsm                                                                                                               // default state                                                                //whether the state is accepted or not
+    string textFileHolder;                                                                      //holds the text file into a string to iterate later on
+    vector<char> charList;                                                                      //list of chars to
+    typedef struct tokens                                                                       //token struct
     {
         string lexemes;
         string tokens;
     } token;
-    vector<token> tokenVector; //holds the token
-    int tempIndex = 0;
-    bool commentCheck = false;
+
+    vector<token> tokenVector; //holds the token in a vector
+    bool commentCheck = false; //comment check so that we dont have to deal with it interfering with our fsm functions
+    bool invalidFlag = false;
 
   public:
     void textToString(string textFile)
@@ -45,11 +43,12 @@ class LexicalAnalyzer
     }
     void printTokenAndLexemes(vector<token> tokenVector)
     { //iterates through the token vector until it reaches max size might need to fix up
+        cout << "TOKEN        LEXEMES" << endl;
         for (int i = 0; i < tokenVector.size(); i++)
         {
             string tempToken = tokenVector[i].tokens;
             string tempLexemes = tokenVector[i].lexemes;
-            cout << tempToken << " = " << tempLexemes << endl;
+            cout << setw(10) << left << tempToken << " = " << tempLexemes << endl;
         }
     }
 
@@ -65,12 +64,14 @@ class LexicalAnalyzer
 
     void Lexer(vector<char> charList, vector<token> tokenVector)
     {
+
         for (vector<char>::iterator it = charList.begin(); it < charList.end(); it++)
         {
+
             if (*it == '!')
             { //change the iterator name from peekIt to something normal DARK TIMES BROOOOOOO
                 vector<char>::iterator peekIt = it++;
-                commentCheck = true;
+                commentCheck = true; //basically an iterator catch up to get rid of the comment part and a flag so that we dont mess up when advancing through
                 while (*peekIt != '!')
                 {
                     cout << "not done" << endl;
@@ -86,6 +87,7 @@ class LexicalAnalyzer
 
             else if (isSeperator(*it) == true)
             {
+                //compares char to array of seperators
                 for (int i = 0; i < 13; i++)
                 {
                     if (SEPERATORS[i] == *it)
@@ -99,6 +101,7 @@ class LexicalAnalyzer
             }
             else if (isOperator(*it) == true)
             {
+                //compares char to array of operators
                 for (int i = 0; i < 8; i++)
                 {
                     if (OPERATORS[i] == *it)
@@ -111,108 +114,143 @@ class LexicalAnalyzer
                 }
             }
 
-            else if (isalpha(*it) == true && commentCheck == false && *it != ' ')
+            else if (isalpha(*it) == true && commentCheck == false)
             {
-
+                bool errorFlag = false; // if a valid identifier is an alpha followed by num,$, or another alpha then all we have to worry about is there being a $ before the first alpha so this a flag for this
+                int finalStateL = 1;    //final states
+                int finalStateD = 2;
+                int finalState$ = 3;
                 string tempString;
-                int defaultS = 1;
-                vector<char>::iterator neext = it++;
-                it--;
+                int defaultS = 0; //state holder defaults at 0 for state transition had a lot of problems because didnt account for decrement
+                string anotherString;
+                vector<char>::iterator previousIterator = it; //an previous iterator
+                string invalidID;
+                --previousIterator;
 
-                while (isAlphanumeric(*neext) == true && *neext != ' ' && defaultS != 5 && commentCheck == false && isAlphanumeric(*it) == true)
+                if (*previousIterator == '$') // basically if there is a $ or num before the alpha the function wouldnt recognize this as not a valid identifier so this gets rid of could also delete token after inputting
+                {
+                    invalidID = "$";
+                    errorFlag = true;
+                    while (commentCheck == false && isAlphanumeric(*it) == true)
+                    {
+                        invalidID += *it;
+                        it++;
+                    }
+                    invalidFlag = true;
+                }
+                else if (isdigit(*previousIterator) == true)
                 {
 
-                    defaultS = legal_identifier[defaultS][findColumn(*it)];
-                    tempString += *it;
-                    it++;
-
-                    neext++;
+                    invalidID += *previousIterator;
+                    errorFlag = true;
+                    while (commentCheck == false && isAlphanumeric(*it) == true)
+                    {
+                        invalidID += *it;
+                        it++;
+                    }
+                    invalidFlag = true;
                 }
-                it--;
 
-                if (keywordTrue(tempString) == true)
+                else // if no other issues it would go to the loop that deals with the fsm as long as not in garbage state it will append and iterate
+                {
+                    while (defaultS != 4 && commentCheck == false && isAlphanumeric(*it) == true)
+                    {
+
+                        defaultS = legal_identifier[defaultS][findColumn(*it)];
+
+                        if (defaultS != 4)
+                            tempString += *it;
+                        it++;
+                    }
+                }
+
+                it--;
+                if (defaultS == finalStateL || defaultS == finalStateD || defaultS == finalState$ || errorFlag == false) //basically checking if the state for the string was in a final state else wouldnt work
+                {
+                    anotherString += tempString;
+                }
+                if (keywordTrue(anotherString) == true && errorFlag == false) //checks if keyword
                 {
                     for (int i = 0; i < 15; i++)
                     {
                         if (tempString == KEYWORDS[i])
                         {
                             token TempToken;
-                            TempToken.lexemes = tempString;
+                            TempToken.lexemes = anotherString;
                             TempToken.tokens = "KEYWORD";
                             tokenVector.push_back(TempToken);
                         }
                     }
                 }
-                else
+                else if (errorFlag == false) //else adds as an identifier if previous test were valid
                 {
                     token TempToken;
-                    TempToken.lexemes = tempString;
+                    TempToken.lexemes = anotherString;
                     TempToken.tokens = "IDENTIFIER";
                     tokenVector.push_back(TempToken);
                 }
 
-                defaultS = 1;
+                else //otherwise just throws error
+                {
+                    cerr << "error invalid identifier " << invalidID << endl;
+                }
             }
 
             else if (isnumber(*it) == true && commentCheck == false)
             {
-                cout << *it << "before " << endl;
+                //same thing as previous function for alphanumeric except for floats and numbers
                 string tempString;
-                int defaultS = 0;
-                vector<char>::iterator floatPeek = it;
-                floatPeek++;
-                //vector<char>::iterator previousPeek = it--;
-                //it--;
+                int currentState = 0; //defaults at 0 but when looping it changes to current state
+                int finalState = 1;
                 bool floatCheck = false;
-                //(isdigit(*it) || (*it == '.' && isdigit(*previousPeek))) && (*floatPeek != ' ') && (defaultS != 4) && !commentCheck
-                //(isdigit(*floatPeek) == true || *floatPeek == '.') && (isdigit(*it) == true || *it == '.') && *floatPeek != ' ' && defaultS != 4 && commentCheck == false
-
                 string loopString;
-                while (((isnumber(*it) == true) || *it == '.') && defaultS != 3 && commentCheck == false)
+
+                while (((isnumber(*it) == true) || *it == '.') && currentState != 3 && commentCheck == false)
                 {
-                    // cout << *it << " in loop " << endl;
-                    // cout << *floatPeek << "in floatPeek loop " << endl;
-                    if (*it == '.')
+
+                    if (*it == '.') //checks for for . to tell if its a float
                     {
-                        std::cout << "We found a float boss! " << endl;
                         floatCheck = true;
                     }
 
-                    //{{4, 2}, {3, 2}, {4, 2}, {1, 1}};
-                    cout << "current state for " << *it << " before is " << defaultS << endl;
-                    defaultS = digit_or_float_fsm[defaultS][findNumColumn(*it)];
-                    cout << " column is " << findNumColumn(*it) << endl;
-                    cout << "current state for " << *it << " is state " << defaultS << endl;
-                    if (defaultS != 3)
+                    currentState = digit_or_float_fsm[currentState][findNumColumn(*it)];
+
+                    if (currentState != 3)
+                    {
                         loopString += *it;
-                    //previousPeek++;
+                    }
+
                     it++;
-                    floatPeek++;
                 }
-                if (defaultS != 3)
+                it--;
+
+                if (currentState != 3 && currentState == finalState) // if not in garbage state and the current state is the same then it can be stored as token
                 {
                     tempString += loopString;
                 }
-                //it--;
-                if (floatCheck == true && defaultS != 3)
+
+                if (floatCheck == true && currentState != 3 && currentState == finalState) //float check is true then added as a REAL
                 {
                     token TempToken;
                     TempToken.lexemes = tempString;
                     TempToken.tokens = "REAL";
                     tokenVector.push_back(TempToken);
                 }
-                else if (floatCheck == false)
+                else if (floatCheck == false) //otherwise an INTEGER
                 {
                     token TempToken;
                     TempToken.lexemes = tempString;
                     TempToken.tokens = "INTEGER";
                     tokenVector.push_back(TempToken);
                 }
-                defaultS = 1;
-                floatCheck = false;
+
+                floatCheck = false; //sets float flag back to normal
             }
         }
-        printTokenAndLexemes(tokenVector);
+        if (invalidFlag != true)
+        {
+            printTokenAndLexemes(tokenVector);
+        } //if there is an identifier error wont print list so that user can change error in identifier
     }
 
     bool isSeperator(char c)
@@ -227,7 +265,7 @@ class LexicalAnalyzer
         return 0;
     }
 
-    bool isOperator(char c)
+    bool isOperator(char c) //operator check function
     {
 
         for (int i = 0; i < 8; i++)
@@ -239,8 +277,8 @@ class LexicalAnalyzer
         }
         return 0;
     }
-    // NEED TO FIX
-    bool isAlphanumeric(char c)
+
+    bool isAlphanumeric(char c) //is alphanumeric or $
     {
         if (isalpha(c) == true || c == '$' || isdigit(c) == true)
         {
@@ -252,7 +290,7 @@ class LexicalAnalyzer
         }
     }
 
-    bool isNumber(char c)
+    bool isNumber(char c) // checks if number or .
     {
         if (isdigit(c) == true || c == '.')
         {
@@ -263,7 +301,7 @@ class LexicalAnalyzer
             return false;
         }
     }
-    bool keywordTrue(string s)
+    bool keywordTrue(string s) //checks if lexeme is a keyword
     {
         for (int i = 0; i < 15; i++)
         {
@@ -278,19 +316,19 @@ class LexicalAnalyzer
     int findColumn(char c)
     { //functions to find the column the char belongs to so it can go through the table to find if accepted or not
         int tempInt;
-        if (isAlphanumeric(c) == true)
+        if (isalpha(c) == true)
         {
-            tempInt = 1;
+            tempInt = 0;
         }
         else if (isdigit(c) == true)
         {
-            tempInt = 2;
+            tempInt = 1;
         }
         else if (c == '$')
         {
-            tempInt = 3;
+            tempInt = 2;
         }
-        else
+        else //otherwise error
         {
 
             cerr << "Error Column doesnt exist" << endl;
@@ -298,7 +336,7 @@ class LexicalAnalyzer
         return tempInt;
     }
 
-    int findNumColumn(char c)
+    int findNumColumn(char c) //seperate column finding functions for integers or real floats
     {
         int holderInt;
         if (c == '.')
