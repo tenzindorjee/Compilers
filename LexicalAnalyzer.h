@@ -118,6 +118,7 @@ class LexicalAnalyzer
                 int defaultS = 1;
                 vector<char>::iterator neext = it++;
                 it--;
+
                 while (isAlphanumeric(*neext) == true && *neext != ' ' && defaultS != 5 && commentCheck == false && isAlphanumeric(*it) == true)
                 {
 
@@ -166,6 +167,7 @@ class LexicalAnalyzer
                 //(isdigit(*it) || (*it == '.' && isdigit(*previousPeek))) && (*floatPeek != ' ') && (defaultS != 4) && !commentCheck
                 //(isdigit(*floatPeek) == true || *floatPeek == '.') && (isdigit(*it) == true || *it == '.') && *floatPeek != ' ' && defaultS != 4 && commentCheck == false
 
+                string loopString;
                 while (((isnumber(*it) == true) || *it == '.') && defaultS != 3 && commentCheck == false)
                 {
                     // cout << *it << " in loop " << endl;
@@ -182,13 +184,17 @@ class LexicalAnalyzer
                     cout << " column is " << findNumColumn(*it) << endl;
                     cout << "current state for " << *it << " is state " << defaultS << endl;
                     if (defaultS != 3)
-                        tempString += *it;
+                        loopString += *it;
                     //previousPeek++;
                     it++;
                     floatPeek++;
                 }
+                if (defaultS != 3)
+                {
+                    tempString += loopString;
+                }
                 //it--;
-                if (floatCheck == true)
+                if (floatCheck == true && defaultS != 3)
                 {
                     token TempToken;
                     TempToken.lexemes = tempString;
