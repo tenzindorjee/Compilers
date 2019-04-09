@@ -18,8 +18,10 @@ class LexicalAnalyzer
     char OPERATORS[8] = {'*', '+', '-', '=', '/', '>', '<', '%'};
     char SEPERATORS[13] = {'\'', '(', ')', '{', '}', '[', ']', ',', '.', ':', ';', '!'};
     const int legal_identifier[5][3] = {{2, 5, 5}, {2, 3, 4}, {5, 5, 4}, {5, 4, 5}, {1, 1, 1}}; // legal identifier fsm
-    const int digit_or_float_fsm[4][2] = {{4, 2}, {3, 2}, {4, 2}, {1, 1}};                      // real or float fsm                                                                      //contains current index of the vector of chars so we can test which index we are at                                                   // default state                                                                //whether the state is accepted or not
-    string textFileHolder;                                                                      //holds the text file into a string to iterate later on
+    const int digit_or_float_fsm[4][2] = {{3, 1}, {2, 1}, {3, 1}, {3, 3}};
+    //const int digit_or_float_fsm[4][2] = {{4, 2}, {3, 2}, {4, 2}, {1, 1}};
+    // real or float fsm                                                                      //contains current index of the vector of chars so we can test which index we are at                                                   // default state                                                                //whether the state is accepted or not
+    string textFileHolder; //holds the text file into a string to iterate later on
     vector<char> charList;
     typedef struct tokens
     {
@@ -109,7 +111,7 @@ class LexicalAnalyzer
                 }
             }
 
-            else if (isAlphanumeric(*it) == true && commentCheck == false && *it != ' ')
+            else if (isalpha(*it) == true && commentCheck == false && *it != ' ')
             {
 
                 string tempString;
@@ -151,29 +153,41 @@ class LexicalAnalyzer
                 defaultS = 1;
             }
 
-            else if (isnumber(*it) == true && commentCheck == false /*&& *it != ' '*/)
+            else if (isnumber(*it) == true && commentCheck == false)
             {
                 cout << *it << "before " << endl;
                 string tempString;
-                int defaultS = 1;
-                vector<char>::iterator floatPeek = it++;
-                // it--;
+                int defaultS = 0;
+                vector<char>::iterator floatPeek = it;
+                floatPeek++;
+                //vector<char>::iterator previousPeek = it--;
+                //it--;
                 bool floatCheck = false;
+                //(isdigit(*it) || (*it == '.' && isdigit(*previousPeek))) && (*floatPeek != ' ') && (defaultS != 4) && !commentCheck
+                //(isdigit(*floatPeek) == true || *floatPeek == '.') && (isdigit(*it) == true || *it == '.') && *floatPeek != ' ' && defaultS != 4 && commentCheck == false
 
-                while (isnumber(*floatPeek) == true && isNumber(*it) == true && *floatPeek != ' ' && defaultS != 4 && commentCheck == false)
+                while (((isnumber(*it) == true) || *it == '.') && defaultS != 3 && commentCheck == false)
                 {
-                    cout << *it << " in loop ";
-                    cout << *floatPeek << "in loop ";
+                    // cout << *it << " in loop " << endl;
+                    // cout << *floatPeek << "in floatPeek loop " << endl;
                     if (*it == '.')
                     {
+                        std::cout << "We found a float boss! " << endl;
                         floatCheck = true;
                     }
-                    defaultS = digit_or_float_fsm[defaultS][findNumColumn(*it)];
-                    tempString += *it;
-                    floatPeek++;
-                    it++;
-                }
 
+                    //{{4, 2}, {3, 2}, {4, 2}, {1, 1}};
+                    cout << "current state for " << *it << " before is " << defaultS << endl;
+                    defaultS = digit_or_float_fsm[defaultS][findNumColumn(*it)];
+                    cout << " column is " << findNumColumn(*it) << endl;
+                    cout << "current state for " << *it << " is state " << defaultS << endl;
+                    if (defaultS != 3)
+                        tempString += *it;
+                    //previousPeek++;
+                    it++;
+                    floatPeek++;
+                }
+                //it--;
                 if (floatCheck == true)
                 {
                     token TempToken;
@@ -258,7 +272,7 @@ class LexicalAnalyzer
     int findColumn(char c)
     { //functions to find the column the char belongs to so it can go through the table to find if accepted or not
         int tempInt;
-        if (isAlphanumeric(c) == true || c == '.')
+        if (isAlphanumeric(c) == true)
         {
             tempInt = 1;
         }
@@ -277,16 +291,17 @@ class LexicalAnalyzer
         }
         return tempInt;
     }
+
     int findNumColumn(char c)
     {
         int holderInt;
         if (c == '.')
         {
-            holderInt = 1;
+            holderInt = 0;
         }
         else if (isdigit(c) == true)
         {
-            holderInt = 2;
+            holderInt = 1;
         }
         else
         {
