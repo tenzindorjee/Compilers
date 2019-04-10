@@ -203,8 +203,21 @@ class LexicalAnalyzer
                 int currentState = 0; //defaults at 0 but when looping it changes to current state
                 int finalState = 1;
                 bool floatCheck = false;
+                bool brokeCheck = false;
                 string loopString;
+                vector<char>::iterator beforeIt = it;
+                vector<char>::iterator afterIt = it;
+                beforeIt--;
+                afterIt++;
 
+                if (isalpha(*beforeIt) == true || isalpha(*afterIt) == true) //fixes the broken
+                {
+                    brokeCheck = true;
+                    while ((isnumber(*it) == true) && commentCheck == false)
+                    {
+                        it++;
+                    }
+                }
                 while (((isnumber(*it) == true) || *it == '.') && currentState != 3 && commentCheck == false)
                 {
 
@@ -229,14 +242,14 @@ class LexicalAnalyzer
                     tempString += loopString;
                 }
 
-                if (floatCheck == true && currentState != 3 && currentState == finalState) //float check is true then added as a REAL
+                if (floatCheck == true && brokeCheck == false) //float check is true then added as a REAL
                 {
                     token TempToken;
                     TempToken.lexemes = tempString;
                     TempToken.tokens = "REAL";
                     tokenVector.push_back(TempToken);
                 }
-                else if (floatCheck == false) //otherwise an INTEGER
+                else if (floatCheck == false && brokeCheck == false) //otherwise an INTEGER
                 {
                     token TempToken;
                     TempToken.lexemes = tempString;
@@ -247,10 +260,8 @@ class LexicalAnalyzer
                 floatCheck = false; //sets float flag back to normal
             }
         }
-        if (invalidFlag != true)
-        {
-            printTokenAndLexemes(tokenVector);
-        } //if there is an identifier error wont print list so that user can change error in identifier
+
+        printTokenAndLexemes(tokenVector);
     }
 
     bool isSeperator(char c)
