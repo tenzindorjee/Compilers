@@ -210,7 +210,7 @@ class LexicalAnalyzer
                 beforeIt--;
                 afterIt++;
 
-                if (isalpha(*beforeIt) == true || isalpha(*afterIt) == true) //fixes the broken
+                if (isalpha(*beforeIt) == true || isalpha(*afterIt) == true) // uses two iterators so that when you have an identifier thats not valid the extra num would get picked up so to prevent that I added this
                 {
                     brokeCheck = true;
                     while ((isnumber(*it) == true) && commentCheck == false)
