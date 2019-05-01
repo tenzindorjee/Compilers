@@ -3,5 +3,6 @@
         "fstream": "cpp",
         "iostream": "cpp",
         "vector": "cpp"
-    }
+    },
+    "C_Cpp.intelliSenseEngineFallback": "Disabled"
 }

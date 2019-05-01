@@ -9,6 +9,7 @@
 #include <string>
 #include <sstream>
 #include <stdexcept>
+#include "SyntaxAnalyzer.h"
 using namespace std;
 class LexicalAnalyzer
 {
@@ -209,17 +210,24 @@ class LexicalAnalyzer
                 vector<char>::iterator afterIt = it;
                 beforeIt--;
                 afterIt++;
-
+                cout << "before " << *beforeIt << " after " << *afterIt << endl;
                 if (isalpha(*beforeIt) == true || isalpha(*afterIt) == true) // uses two iterators so that when you have an identifier thats not valid the extra num would get picked up so to prevent that I added this
                 {
                     brokeCheck = true;
                     while ((isnumber(*it) == true) && commentCheck == false)
                     {
+                        beforeIt++;
                         it++;
+                        afterIt++;
                     }
                 }
-                while (((isnumber(*it) == true) || *it == '.') && currentState != 3 && commentCheck == false)
+                while (((isnumber(*it) == true) || *it == '.') && currentState != 3 && commentCheck == false && brokeCheck == false && (isalpha(*beforeIt) != true || isalpha(*afterIt) != true))
                 {
+
+                    if (isalpha(*beforeIt) == true || isalpha(*afterIt) == true)
+                    {
+                        brokeCheck = true;
+                    }
 
                     if (*it == '.') //checks for for . to tell if its a float
                     {
@@ -237,7 +245,7 @@ class LexicalAnalyzer
                 }
                 it--;
 
-                if (currentState != 3 && currentState == finalState) // if not in garbage state and the current state is the same then it can be stored as token
+                if (currentState != 3 && currentState == finalState && brokeCheck == false) // if not in garbage state and the current state is the same then it can be stored as token
                 {
                     tempString += loopString;
                 }
@@ -261,7 +269,13 @@ class LexicalAnalyzer
             }
         }
 
-        printTokenAndLexemes(tokenVector);
+        //printTokenAndLexemes(tokenVector);
+    }
+
+    vector<token> returnTokenVector()
+    {
+        vector<token> tempVector = tokenVector;
+        return tempVector;
     }
 
     bool isSeperator(char c)
