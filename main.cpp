@@ -15,7 +15,7 @@ int main()
     testCase.textToString("test.txt");
 
     SyntaxAnalyzer SA(testCase.getTokens());
-
+    SA.tdpParser();
     // SA.getNextToken();
 
     // SAnalyzer.getNextToken();

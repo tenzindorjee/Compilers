@@ -35,7 +35,7 @@ class SyntaxAnalyzer
         }
     }
 
-    void TDPparser()
+    void tdpParser()
     {
         if (tokenVect[incrementCount].lexemes == "$" || tokenVect[incrementCount].lexemes == "%")
         {
@@ -47,6 +47,9 @@ class SyntaxAnalyzer
         }
 
 
+        TDPstack.push("$");
+        S();
+
     }
 
     bool S()
@@ -56,17 +59,21 @@ class SyntaxAnalyzer
             incrementCount++;
             if(tokenVect[incrementCount].lexemes == "=")
             {
-            increment++;
+            cout << " yay";
+            incrementCount++;
             return true;
+
             }
             else
             {
+                cout << " RIP";
                 return false;
             }
                 
         }
         else 
         {
+            cout << " RIP";
              return false;
         }
            
@@ -172,7 +179,7 @@ class SyntaxAnalyzer
             TDPstack.push("R");
             cout << "PUSH " << TDPstack.top() << endl;
             return true;
-            j
+            
         }
 
         else if (tokenVect[incrementCount].lexemes == "(")
@@ -191,6 +198,7 @@ class SyntaxAnalyzer
         else
         {
             cout << "ERROR: <Term> -> <Factor> <TermPrime> ";
+            return false;
         }
     }
 
@@ -293,6 +301,7 @@ class SyntaxAnalyzer
         else
         {
             cout << "ERROR: F->(E)|i " << endl;
+            return false;
         }
     }
 };

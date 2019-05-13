@@ -274,7 +274,7 @@ class LexicalAnalyzer
             }
         }
 
-        printTokenAndLexemes(tokenVector);
+        //printTokenAndLexemes(tokenVector);
     }
 
     // vector<token> returnTokenVector()
