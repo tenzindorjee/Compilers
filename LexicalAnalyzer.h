@@ -9,7 +9,6 @@
 #include <string>
 #include <sstream>
 #include <stdexcept>
-#include "SyntaxAnalyzer.h"
 using namespace std;
 class LexicalAnalyzer
 {
@@ -21,17 +20,23 @@ class LexicalAnalyzer
     const int digit_or_float_fsm[4][2] = {{3, 1}, {2, 1}, {3, 1}, {3, 3}};                      // real or float fsm                                                                                                               // default state                                                                //whether the state is accepted or not
     string textFileHolder;                                                                      //holds the text file into a string to iterate later on
     vector<char> charList;                                                                      //list of chars to
-    typedef struct tokens                                                                       //token struct
+
+    bool commentCheck = false; //comment check so that we dont have to deal with it interfering with our fsm functions
+    bool invalidFlag = false;
+
+  public:
+    typedef struct tokens //token struct
     {
         string lexemes;
         string tokens;
     } token;
 
     vector<token> tokenVector; //holds the token in a vector
-    bool commentCheck = false; //comment check so that we dont have to deal with it interfering with our fsm functions
-    bool invalidFlag = false;
 
-  public:
+    vector<token> getTokens()
+    {
+        return tokenVector;
+    }
     void textToString(string textFile)
     { //opens textfile and then stores it into a string for further use
         ifstream inFile;
@@ -63,7 +68,7 @@ class LexicalAnalyzer
         Lexer(charList, tokenVector);
     }
 
-    void Lexer(vector<char> charList, vector<token> tokenVector)
+    void Lexer(vector<char> charList, vector<token> &tokenVector)
     {
 
         for (vector<char>::iterator it = charList.begin(); it < charList.end(); it++)
@@ -269,14 +274,14 @@ class LexicalAnalyzer
             }
         }
 
-        //printTokenAndLexemes(tokenVector);
+        printTokenAndLexemes(tokenVector);
     }
 
-    vector<token> returnTokenVector()
-    {
-        vector<token> tempVector = tokenVector;
-        return tempVector;
-    }
+    // vector<token> returnTokenVector()
+    // {
+    //     vector<token> tempVector = tokenVector;
+    //     return tempVector;
+    // }
 
     bool isSeperator(char c)
     {
