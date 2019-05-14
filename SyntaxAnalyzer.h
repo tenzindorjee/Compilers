@@ -37,14 +37,26 @@ class SyntaxAnalyzer
 
     void tdpParser()
     {
-        if (tokenVect[incrementCount].lexemes == "$" || tokenVect[incrementCount].lexemes == "%")
+        if (tokenVect[incrementCount].lexemes == "$")
         {
-            incrementCount++;
-            if (tokenVect[incrementCount].lexemes == "$" || tokenVect[incrementCount].lexemes == "%")
+            
+            if (tokenVect[incrementCount].lexemes == "$")
             {
+                incrementCount++;
                 incrementCount++;
             }
         }
+
+        if (tokenVect[incrementCount].lexemes == "%")
+        {
+            
+            if (tokenVect[incrementCount].lexemes == "%")
+            {
+                incrementCount++;
+                incrementCount++;
+            }
+        }
+
 
 
         TDPstack.push("$");
@@ -72,7 +84,7 @@ class SyntaxAnalyzer
 
            
 
-            if(TDPstack.top() ==  tokenVect[incrementCount].tokens || TDPstack.top() == tokenVect[incrementCount].lexemes)
+            if(TDPstack.top() ==  tokenVect[incrementCount].tokens || TDPstack.top() == "IDENTIFIER")
             {
                 incrementCount++;
                 TDPstack.pop();
@@ -100,8 +112,17 @@ class SyntaxAnalyzer
             }
             else if (getCurrentToken() == ";")
             {
-                incrementCount++;
-                KMS();
+                
+                cout << "string is accepted" << endl;
+
+                if(incrementCount!= tokenVect.size()){
+                    incrementCount++;
+                    KMS();
+                }
+                else {
+                    cout << "DONE" << endl;
+                }
+                
             }
 
 
@@ -128,21 +149,21 @@ class SyntaxAnalyzer
             incrementCount++;
             if(tokenVect[incrementCount].lexemes == "=")
             {
-            // cout << "works";
+            cout << "works";
             incrementCount++;
             return true;
 
             }
             else
             {
-                // cout << "RIP";
+                cout << "RIP";
                 return false;
             }
                 
         }
         else 
         {
-            // cout << "RIP";
+            cout << "RIP";
              return false;
         }
            
