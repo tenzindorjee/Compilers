@@ -19,7 +19,7 @@ class SyntaxAnalyzer
 
     string getCurrentToken()
     {
-        return tokenVect[0].tokens;
+        return tokenVect[incrementCount].lexemes;
     }
 
     string getNextToken()
@@ -48,7 +48,76 @@ class SyntaxAnalyzer
 
 
         TDPstack.push("$");
-        S();
+        KMS();
+
+
+        
+    }
+
+
+    void KMS(){
+
+
+
+        if(S() == true){
+
+        TDPstack.push("E");
+
+        }
+        else
+            cout << "ERROR: S-> i = E" << endl;
+
+
+        while(TDPstack.top() != "$"){
+
+           
+
+            if(TDPstack.top() ==  tokenVect[incrementCount].tokens || TDPstack.top() == tokenVect[incrementCount].lexemes)
+            {
+                incrementCount++;
+                TDPstack.pop();
+            }
+
+            else if(TDPstack.top() == "E"){
+
+                E();
+            }
+
+            else if(TDPstack.top() == "Q" ){
+                Q();
+            }
+
+            else if(TDPstack.top() == "T"){
+                T();
+            }
+
+            else if(TDPstack.top() == "R"){
+                R();
+            }
+
+            else if(TDPstack.top() == "F"){
+                F();
+            }
+            else if (getCurrentToken() == ";")
+            {
+                incrementCount++;
+                KMS();
+            }
+
+
+
+        }
+
+            
+
+
+
+
+
+
+
+
+
 
     }
 
@@ -59,21 +128,21 @@ class SyntaxAnalyzer
             incrementCount++;
             if(tokenVect[incrementCount].lexemes == "=")
             {
-            cout << " yay";
+            // cout << "works";
             incrementCount++;
             return true;
 
             }
             else
             {
-                cout << " RIP";
+                // cout << "RIP";
                 return false;
             }
                 
         }
         else 
         {
-            cout << " RIP";
+            // cout << "RIP";
              return false;
         }
            
@@ -85,9 +154,9 @@ class SyntaxAnalyzer
         {
             TDPstack.pop();
             cout << "POP " << TDPstack.top() << endl;
-            TDPstack.push("T");
-            cout << "PUSH " << TDPstack.top() << endl;
             TDPstack.push("Q");
+            cout << "PUSH " << TDPstack.top() << endl;
+            TDPstack.push("T");
 
             cout << "PUSH " << TDPstack.top() << endl;
             return true;
@@ -98,9 +167,9 @@ class SyntaxAnalyzer
             cout << "POP " << TDPstack.top() << endl;
             TDPstack.pop();
 
-            TDPstack.push("T");
-            cout << "PUSH " << TDPstack.top() << endl;
             TDPstack.push("Q");
+            cout << "PUSH " << TDPstack.top() << endl;
+            TDPstack.push("T");
             cout << "PUSH " << TDPstack.top() << endl;
             return true;
         }
@@ -119,11 +188,17 @@ class SyntaxAnalyzer
             cout << "POP " << TDPstack.top() << endl;
             TDPstack.pop();
 
-            TDPstack.push("+");
-            cout << "PUSH " << TDPstack.top() << endl;
+            
 
             TDPstack.push("Q");
             cout << "PUSH " << TDPstack.top() << endl;
+
+            TDPstack.push("T");
+            cout << "PUSH " << TDPstack.top() << endl;
+
+            TDPstack.push("+");
+            cout << "PUSH " << TDPstack.top() << endl;
+
             return true;
         }
 
@@ -133,13 +208,15 @@ class SyntaxAnalyzer
             cout << "POP " << TDPstack.top() << endl;
             TDPstack.pop();
 
-            TDPstack.push("-");
+            TDPstack.push("Q");
             cout << "PUSH " << TDPstack.top() << endl;
+
+            
 
             TDPstack.push("T");
             cout << "PUSH " << TDPstack.top() << endl;
-
-            TDPstack.push("Q");
+            
+            TDPstack.push("-");
             cout << "PUSH " << TDPstack.top() << endl;
             return true;
         }
@@ -173,11 +250,13 @@ class SyntaxAnalyzer
             cout << "POP " << TDPstack.top() << endl;
             TDPstack.pop();
 
+            TDPstack.push("R");
+            cout << "PUSH " << TDPstack.top() << endl;
+
             TDPstack.push("F");
             cout << "PUSH " << TDPstack.top() << endl;
 
-            TDPstack.push("R");
-            cout << "PUSH " << TDPstack.top() << endl;
+            
             return true;
             
         }
@@ -188,10 +267,10 @@ class SyntaxAnalyzer
             cout << "POP " << TDPstack.top() << endl;
             TDPstack.pop();
 
-            TDPstack.push("F");
+            TDPstack.push("R");
             cout << "PUSH " << TDPstack.top() << endl;
 
-            TDPstack.push("R");
+            TDPstack.push("F");
             cout << "PUSH " << TDPstack.top() << endl;
             return true;
         }
@@ -224,13 +303,13 @@ class SyntaxAnalyzer
             cout << "POP " << TDPstack.top() << endl;
             TDPstack.pop();
 
-            TDPstack.push("*");
+            TDPstack.push("R");
             cout << "PUSH " << TDPstack.top() << endl;
 
             TDPstack.push("F");
             cout << "PUSH " << TDPstack.top() << endl;
 
-            TDPstack.push("R");
+            TDPstack.push("*");
             cout << "PUSH " << TDPstack.top() << endl;
             return true;
         }
@@ -240,14 +319,14 @@ class SyntaxAnalyzer
             cout << "POP " << TDPstack.top() << endl;
             TDPstack.pop();
 
-            TDPstack.push("/");
+            TDPstack.push("R");
             cout << "PUSH " << TDPstack.top() << endl;
 
             TDPstack.push("F");
 
             cout << "PUSH " << TDPstack.top() << endl;
 
-            TDPstack.push("R");
+            TDPstack.push("/");
             cout << "PUSH " << TDPstack.top() << endl;
             return true;
         }
@@ -287,13 +366,13 @@ class SyntaxAnalyzer
         else if (tokenVect[incrementCount].lexemes == "(")
         {
 
-            TDPstack.push("(");
+            TDPstack.push(")");
             cout << "PUSH " << TDPstack.top() << endl;
 
             TDPstack.push("E");
             cout << "PUSH " << TDPstack.top() << endl;
 
-            TDPstack.push(")");
+            TDPstack.push("(");
             cout << "PUSH " << TDPstack.top() << endl;
             return true;
         }
