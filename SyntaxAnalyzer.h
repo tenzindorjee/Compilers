@@ -1,6 +1,8 @@
 #include <vector>
 #include <stack>
 
+//basically the string gets accepted but then it breaks cause of the loop we are using //
+
 class SyntaxAnalyzer
 {
   private:
@@ -76,17 +78,21 @@ class SyntaxAnalyzer
         TDPstack.push("E");
 
         }
-        else
-            cout << "ERROR: S-> i = E" << endl;
+        else if (S() == false)
+        {
+        cout << "ERROR: S-> i = E" << endl;
+        }
+            
 
 
         while(TDPstack.top() != "$"){
 
            
 
-            if(TDPstack.top() ==  tokenVect[incrementCount].tokens || TDPstack.top() == "IDENTIFIER")
+            if(TDPstack.top() == "*" || TDPstack.top() == "+" || TDPstack.top() == "(" || TDPstack.top() == ")" || TDPstack.top() == "-" || TDPstack.top() == "/" || TDPstack.top() == "-" || TDPstack.top() == "IDENTIFIER" || TDPstack.top() == "$")
             {
                 incrementCount++;
+                cout << "popping: " << TDPstack.top() << endl;
                 TDPstack.pop();
             }
 
@@ -110,20 +116,22 @@ class SyntaxAnalyzer
             else if(TDPstack.top() == "F"){
                 F();
             }
-            else if (getCurrentToken() == ";")
-            {
+            else 
+                cout << "ERROR this loop sucks";
+            // else if (tokenVect[incrementCount].lexemes == ";")
+            // {
                 
-                cout << "string is accepted" << endl;
+            //     cout << "string is accepted" << endl;
 
-                if(incrementCount!= tokenVect.size()){
-                    incrementCount++;
-                    KMS();
-                }
-                else {
-                    cout << "DONE" << endl;
-                }
+            //     if(incrementCount!= tokenVect.size()){
+            //         incrementCount++;
+            //         KMS();
+            //     }
+            //     else {
+            //         cout << "DONE" << endl;
+            //     }
                 
-            }
+            // }
 
 
 
@@ -149,7 +157,7 @@ class SyntaxAnalyzer
             incrementCount++;
             if(tokenVect[incrementCount].lexemes == "=")
             {
-            cout << "works";
+            cout << "S->i=E" << endl;
             incrementCount++;
             return true;
 
